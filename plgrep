@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use feature 'say';
+use Getopt::Std;
 use Encode;
 use Encode::Guess;
 
@@ -13,10 +14,17 @@ sub plgrep_file {
     my $data = do { local $/; <$fh>; };
     close $fh;
 
+    my $mod = '';
+    if ($conf->{opts}{i}) {
+        $mod .= 'i';
+    }
+    my $pattern_re = qr/(?$mod)$conf->{pattern}/;
+
     my $enc = guess_encoding($data, qw(euc-jp shiftjis 7bit-jis));
     my @lines = split /\r?\n/, $enc->decode($data);
+
     for my $line (@lines) {
-        if ($line =~ /$conf->{pattern}/) {
+        if ($line =~ /$pattern_re/) {
             if ($conf->{numfiles} > 1) {
                 print $file, ':';
             }
@@ -30,12 +38,19 @@ sub usage {
     exit 1;
 }
 
+my %opts;
+getopts('i' => \%opts);
+
 if (@ARGV == 1) {
 
 } elsif (@ARGV >= 2) {
     my $ptn = shift @ARGV;
 
-    my $conf = +{pattern => $ptn, numfiles => scalar(@ARGV)};
+    my $conf = +{
+        pattern => $ptn,
+        numfiles => scalar(@ARGV),
+        opts => \%opts,
+    };
     for my $f (@ARGV) {
         plgrep_file($conf, $f);
     }
