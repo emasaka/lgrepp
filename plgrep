@@ -66,7 +66,7 @@ GetOptions(\%opts, 'i', 'color=s');
 
 my $ptn;
 if (@ARGV == 1) {
-    $ptn = shift @ARGV;
+    $ptn = decode('utf-8', shift @ARGV); # assuming UTF-8
 
     my $conf = +{
         pattern => $ptn,
@@ -75,7 +75,7 @@ if (@ARGV == 1) {
     };
     plgrep_file($conf, '/dev/stdin');
 } elsif (@ARGV >= 2) {
-    $ptn = shift @ARGV;
+    $ptn = decode('utf-8', shift @ARGV); # assuming UTF-8
 
     my $conf = +{
         pattern => $ptn,
