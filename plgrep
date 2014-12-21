@@ -2,9 +2,21 @@
 use strict;
 use warnings;
 use feature 'say';
-use Getopt::Std;
+use Getopt::Long;
 use Encode;
 use Encode::Guess;
+use POSIX qw(isatty);
+
+sub parse_color_opts {
+    my $conf = shift;
+    my $color= $conf->{opts}->{color};
+
+    if ($color &&
+        (($color eq 'always') ||
+         (($color eq 'auto') && isatty(*STDOUT)) )) {
+        $conf->{color} = 1;
+    }
+}
 
 sub opt2modifier {
     my $opts = shift;
@@ -12,6 +24,8 @@ sub opt2modifier {
     $mod .= 'i' if ($opts->{i});
     $mod;
 }
+
+my $HILIGHT_COLOR = '01;31';
 
 sub plgrep_file {
     my $conf = shift;
@@ -21,6 +35,7 @@ sub plgrep_file {
     my $data = do { local $/; <$fh>; };
     close $fh;
 
+    parse_color_opts($conf);
     my $mod = opt2modifier($conf->{opts});
     my $pattern_re = qr/(?$mod)$conf->{pattern}/;
 
@@ -32,6 +47,10 @@ sub plgrep_file {
             if ($conf->{numfiles} > 1) {
                 print $file, ':';
             }
+            if ($conf->{color}) {
+                $line =~ s/$pattern_re/\33[${HILIGHT_COLOR}m\33[K$&\33[m\33[K/g;
+            }
+
             say encode('utf-8', $line);
         }
     }
@@ -43,7 +62,7 @@ sub usage {
 }
 
 my %opts;
-getopts('i' => \%opts);
+GetOptions(\%opts, 'i', 'color=s');
 
 my $ptn;
 if (@ARGV == 1) {
