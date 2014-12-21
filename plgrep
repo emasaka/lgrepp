@@ -6,6 +6,13 @@ use Getopt::Std;
 use Encode;
 use Encode::Guess;
 
+sub opt2modifier {
+    my $opts = shift;
+    my $mod = '';
+    $mod .= 'i' if ($opts->{i});
+    $mod;
+}
+
 sub plgrep_file {
     my $conf = shift;
     my $file = shift;
@@ -14,10 +21,7 @@ sub plgrep_file {
     my $data = do { local $/; <$fh>; };
     close $fh;
 
-    my $mod = '';
-    if ($conf->{opts}{i}) {
-        $mod .= 'i';
-    }
+    my $mod = opt2modifier($conf->{opts});
     my $pattern_re = qr/(?$mod)$conf->{pattern}/;
 
     my $enc = guess_encoding($data, qw(euc-jp shiftjis 7bit-jis));
