@@ -1,10 +1,10 @@
 ## NAME
 
-plgrep - Perl implementation of [lgrep](http://www.ff.iij4u.or.jp/~nrt/lv/)
+lgrepp - Perl implementation of [lgrep](http://www.ff.iij4u.or.jp/~nrt/lv/)
 
 ## SYNOPSIS
 
-plgrep [options] PATTERN [FILE...]
+lgrepp [options] PATTERN [FILE...]
 
 ## DESCRIPTION
 

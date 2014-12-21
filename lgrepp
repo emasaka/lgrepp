@@ -27,7 +27,7 @@ sub opt2modifier {
 
 my $HILIGHT_COLOR = '01;31';
 
-sub plgrep_file {
+sub lgrepp_file {
     my $conf = shift;
     my $file = shift;
 
@@ -57,7 +57,7 @@ sub plgrep_file {
 }
 
 sub usage {
-    say 'Usage: plgrep [options] PATTERN [FILE...]';
+    say 'Usage: lgrepp [options] PATTERN [FILE...]';
     exit 1;
 }
 
@@ -73,7 +73,7 @@ if (@ARGV == 1) {
         numfiles => 0,
         opts => \%opts,
     };
-    plgrep_file($conf, '/dev/stdin');
+    lgrepp_file($conf, '/dev/stdin');
 } elsif (@ARGV >= 2) {
     $ptn = decode('utf-8', shift @ARGV); # assuming UTF-8
 
@@ -83,7 +83,7 @@ if (@ARGV == 1) {
         opts => \%opts,
     };
     for my $f (@ARGV) {
-        plgrep_file($conf, $f);
+        lgrepp_file($conf, $f);
     }
 } else {
     usage;
