@@ -45,10 +45,18 @@ sub usage {
 my %opts;
 getopts('i' => \%opts);
 
+my $ptn;
 if (@ARGV == 1) {
+    $ptn = shift @ARGV;
 
+    my $conf = +{
+        pattern => $ptn,
+        numfiles => 0,
+        opts => \%opts,
+    };
+    plgrep_file($conf, '/dev/stdin');
 } elsif (@ARGV >= 2) {
-    my $ptn = shift @ARGV;
+    $ptn = shift @ARGV;
 
     my $conf = +{
         pattern => $ptn,
