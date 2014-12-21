@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use feature 'say';
+use Encode;
+use Encode::Guess;
+
+sub plgrep_file {
+    my $conf = shift;
+    my $file = shift;
+
+    open my $fh, '<', $file or die;
+    my $data = do { local $/; <$fh>; };
+    close $fh;
+
+    my $enc = guess_encoding($data, qw(euc-jp shiftjis 7bit-jis));
+    my @lines = split /\r?\n/, $enc->decode($data);
+    for my $line (@lines) {
+        if ($line =~ /$conf->{pattern}/) {
+            if ($conf->{numfiles} > 1) {
+                print $file, ':';
+            }
+            say encode('utf-8', $line);
+        }
+    }
+}
+
+sub usage {
+    say 'USAGE: plgrep [options] PATTERN [FILE...]';
+    exit 1;
+}
+
+if (@ARGV == 1) {
+
+} elsif (@ARGV >= 2) {
+    my $ptn = shift @ARGV;
+
+    my $conf = +{pattern => $ptn, numfiles => scalar(@ARGV)};
+    for my $f (@ARGV) {
+        plgrep_file($conf, $f);
+    }
+} else {
+    usage;
+}
