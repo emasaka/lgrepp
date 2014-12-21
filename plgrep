@@ -57,7 +57,7 @@ sub plgrep_file {
 }
 
 sub usage {
-    say 'USAGE: plgrep [options] PATTERN [FILE...]';
+    say 'Usage: plgrep [options] PATTERN [FILE...]';
     exit 1;
 }
 
