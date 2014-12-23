@@ -26,16 +26,17 @@ sub parse_pattern_opts {
         (($mod eq '') ? qr/$conf->{pattern}/ : qr/(?$mod)$conf->{pattern}/);
 }
 
-sub parse_filename_opts {
+sub parse_file_num_opts {
     my $conf = shift;
     $conf->{with_filename} = 1 if ($conf->{opts}->{'with-filename'});
+    $conf->{line_number} = 1 if ($conf->{opts}->{'line-number'});
 }
 
 sub parse_opts {
     my $conf = shift;
     parse_color_opts($conf);
     parse_pattern_opts($conf);
-    parse_filename_opts($conf);
+    parse_file_num_opts($conf);
 }
 
 my $HILIGHT_COLOR = '01;31';
@@ -53,17 +54,18 @@ sub lgrepp_file {
     my $enc = guess_encoding($data, qw(euc-jp shiftjis 7bit-jis));
     my @lines = split /\r?\n/, $enc->decode($data);
 
+    my $linenum = 1;
     for my $line (@lines) {
         if ($line =~ /$pattern_re/) {
-            if ($conf->{with_filename}) {
-                print $file, ':';
-            }
+            print $file, ':' if ($conf->{with_filename});
+            print $linenum, ':' if ($conf->{line_number});
 
             if ($conf->{color}) {
                 $line =~ s/$pattern_re/\33[${HILIGHT_COLOR}m\33[K$&\33[m\33[K/g;
             }
             say encode('utf-8', $line);
         }
+        $linenum++;
     }
 }
 
@@ -73,7 +75,12 @@ sub usage {
 }
 
 my %opts;
-GetOptions(\%opts, 'ignore-case|i', 'color=s', 'with-filename|H');
+GetOptions(\%opts,
+           'ignore-case|i',
+           'color=s',
+           'with-filename|H',
+           'line-number|n',
+       );
 
 my $ptn;
 if (@ARGV == 1) {
