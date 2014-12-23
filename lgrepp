@@ -45,6 +45,8 @@ sub lgrepp_file {
     my $conf = shift;
     my $file = shift;
 
+    return if (-d $file);
+
     open my $fh, '<', $file or die;
     my $data = do { local $/; <$fh>; };
     close $fh;
