@@ -53,21 +53,27 @@ sub lgrepp_file {
 
     my $pattern_re = $conf->{pattern_re};
 
-    my $enc = guess_encoding($data, qw(euc-jp shiftjis 7bit-jis));
-    my @lines = split /\r?\n/, $enc->decode($data);
-
-    my $linenum = 1;
-    for my $line (@lines) {
-        if ($line =~ /$pattern_re/) {
-            print $file, ':' if ($conf->{with_filename});
-            print $linenum, ':' if ($conf->{line_number});
-
-            if ($conf->{color}) {
-                $line =~ s/$pattern_re/\33[${HILIGHT_COLOR}m\33[K$&\33[m\33[K/g;
-            }
-            say encode('utf-8', $line);
+    if ($data =~ /\x00/) {
+        if ($data =~ /$pattern_re/) {
+            say "Binary file $file matches";
         }
-        $linenum++;
+    } else {
+        my $enc = guess_encoding($data, qw(euc-jp shiftjis 7bit-jis));
+        my @lines = split /\r?\n/, $enc->decode($data);
+
+        my $linenum = 1;
+        for my $line (@lines) {
+            if ($line =~ /$pattern_re/) {
+                print $file, ':' if ($conf->{with_filename});
+                print $linenum, ':' if ($conf->{line_number});
+
+                if ($conf->{color}) {
+                    $line =~ s/$pattern_re/\33[${HILIGHT_COLOR}m\33[K$&\33[m\33[K/g;
+                }
+                say encode('utf-8', $line);
+            }
+            $linenum++;
+        }
     }
 }
 
