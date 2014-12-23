@@ -70,7 +70,7 @@ sub lgrepp_file {
 }
 
 sub usage {
-    say 'Usage: lgrepp [options] PATTERN [FILE...]';
+    say STDERR 'Usage: lgrepp [options] PATTERN [FILE...]';
     exit 1;
 }
 
