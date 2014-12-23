@@ -82,28 +82,23 @@ GetOptions(\%opts,
            'line-number|n',
        );
 
-my $ptn;
-if (@ARGV == 1) {
-    $ptn = decode('utf-8', shift @ARGV); # assuming UTF-8
+if (@ARGV == 0) {
+    usage;
+}
 
-    my $conf = +{
-        pattern => $ptn,
-        opts => \%opts,
-    };
+my $ptn = decode('utf-8', shift @ARGV); # assuming UTF-8
+
+my $conf = +{
+    pattern => $ptn,
+    opts => \%opts,
+};
+if (@ARGV == 0) {
     parse_opts($conf);
     lgrepp_file($conf, '/dev/stdin');
-} elsif (@ARGV >= 2) {
-    $ptn = decode('utf-8', shift @ARGV); # assuming UTF-8
-
-    my $conf = +{
-        pattern => $ptn,
-        with_filename => (scalar(@ARGV) > 1),
-        opts => \%opts,
-    };
+} else {
+    $conf->{with_filename} = (scalar(@ARGV) > 1);
     parse_opts($conf);
     for my $f (@ARGV) {
         lgrepp_file($conf, $f);
     }
-} else {
-    usage;
 }
