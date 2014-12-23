@@ -26,10 +26,16 @@ sub parse_pattern_opts {
         (($mod eq '') ? qr/$conf->{pattern}/ : qr/(?$mod)$conf->{pattern}/);
 }
 
+sub parse_filename_opts {
+    my $conf = shift;
+    $conf->{with_filename} = 1 if ($conf->{opts}->{'with-filename'});
+}
+
 sub parse_opts {
     my $conf = shift;
     parse_color_opts($conf);
     parse_pattern_opts($conf);
+    parse_filename_opts($conf);
 }
 
 my $HILIGHT_COLOR = '01;31';
@@ -49,13 +55,13 @@ sub lgrepp_file {
 
     for my $line (@lines) {
         if ($line =~ /$pattern_re/) {
-            if ($conf->{numfiles} > 1) {
+            if ($conf->{with_filename}) {
                 print $file, ':';
             }
+
             if ($conf->{color}) {
                 $line =~ s/$pattern_re/\33[${HILIGHT_COLOR}m\33[K$&\33[m\33[K/g;
             }
-
             say encode('utf-8', $line);
         }
     }
@@ -67,7 +73,7 @@ sub usage {
 }
 
 my %opts;
-GetOptions(\%opts, 'i', 'color=s');
+GetOptions(\%opts, 'i', 'color=s', 'with-filename|H');
 
 my $ptn;
 if (@ARGV == 1) {
@@ -75,7 +81,6 @@ if (@ARGV == 1) {
 
     my $conf = +{
         pattern => $ptn,
-        numfiles => 0,
         opts => \%opts,
     };
     parse_opts($conf);
@@ -85,7 +90,7 @@ if (@ARGV == 1) {
 
     my $conf = +{
         pattern => $ptn,
-        numfiles => scalar(@ARGV),
+        with_filename => (scalar(@ARGV) > 1),
         opts => \%opts,
     };
     parse_opts($conf);
