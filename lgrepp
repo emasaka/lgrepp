@@ -21,7 +21,7 @@ sub parse_color_opts {
 sub parse_pattern_opts {
     my $conf = shift;
     my $mod = '';
-    $mod .= 'i' if ($conf->{opts}->{i});
+    $mod .= 'i' if ($conf->{opts}->{'ignore-case'});
     $conf->{pattern_re} =
         (($mod eq '') ? qr/$conf->{pattern}/ : qr/(?$mod)$conf->{pattern}/);
 }
@@ -73,7 +73,7 @@ sub usage {
 }
 
 my %opts;
-GetOptions(\%opts, 'i', 'color=s', 'with-filename|H');
+GetOptions(\%opts, 'ignore-case|i', 'color=s', 'with-filename|H');
 
 my $ptn;
 if (@ARGV == 1) {
