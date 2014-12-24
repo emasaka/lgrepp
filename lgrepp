@@ -47,7 +47,10 @@ sub lgrepp_file {
 
     return if (-d $file);
 
-    open my $fh, '<', $file or die;
+    open my $fh, '<', $file or do {
+        say STDERR "can't open $file";
+        return;
+    };
     my $data = do { local $/; <$fh>; };
     close $fh;
 
