@@ -6,6 +6,7 @@ use Getopt::Long;
 use Encode;
 use Encode::Guess;
 use POSIX qw(isatty);
+use File::Find;
 
 sub parse_color_opts {
     my $conf = shift;
@@ -91,6 +92,7 @@ GetOptions(\%opts,
            'color=s',
            'with-filename|H',
            'line-number|n',
+           'recursive|r|R',
        );
 
 if (@ARGV == 0) {
@@ -103,7 +105,14 @@ my $conf = +{
     pattern => $ptn,
     opts => \%opts,
 };
-if (@ARGV == 0) {
+
+if ($opts{'recursive'}) {
+    $conf->{with_filename} = 1;
+    parse_opts($conf);
+    find({ wanted => sub { lgrepp_file($conf, $File::Find::name) },
+           follow_fast => 1, no_chdir => 1 } ,
+         (@ARGV == 0 ? ('.') : @ARGV) );
+} elsif (@ARGV == 0) {
     parse_opts($conf);
     lgrepp_file($conf, '/dev/stdin');
 } else {
