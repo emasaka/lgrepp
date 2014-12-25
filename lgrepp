@@ -64,7 +64,7 @@ sub lgrepp_file {
             say "Binary file $file matches";
         }
     } else {
-        my $enc = guess_encoding($data, qw(euc-jp shiftjis 7bit-jis));
+        my $enc = guess_encoding($data, qw(euc-jp cp932 7bit-jis));
         my @lines = split /\r?\n/, $enc->decode($data);
 
         my $linenum = 1;
