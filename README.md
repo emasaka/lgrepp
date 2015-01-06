@@ -21,6 +21,10 @@ Options of lgrepp are subset of grep.
 
 ignore case distinctions
 
+### -F, --fixed-strings
+
+interpret PATTERN as an string
+
 ### --color=[WHEN]
 
 use markers to highlight the matching strings.

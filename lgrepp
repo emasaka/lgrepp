@@ -24,8 +24,9 @@ sub parse_pattern_opts {
     my $conf = shift;
     my $mod = '';
     $mod .= 'i' if ($conf->{opts}->{'ignore-case'});
-    $conf->{pattern_re} =
-        (($mod eq '') ? qr/$conf->{pattern}/ : qr/(?$mod)$conf->{pattern}/);
+    my $ptn = ($conf->{opts}->{'fixed-strings'} ?
+                   quotemeta($conf->{pattern}) : $conf->{pattern} );
+    $conf->{pattern_re} = (($mod eq '') ? qr/$ptn/ : qr/(?$mod)$ptn/);
 }
 
 sub parse_file_num_opts {
@@ -113,6 +114,7 @@ Encode::Locale::decode_argv;
 my %opts;
 GetOptions(\%opts,
            'ignore-case|i',
+           'fixed-strings|F',
            'color=s',
            'with-filename|H',
            'line-number|n',
