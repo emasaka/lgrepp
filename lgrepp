@@ -109,6 +109,28 @@ sub lgrepp_file {
     }
 }
 
+sub lgrepp_stdin {
+    my $conf = shift;
+    my $pattern_re = $conf->{pattern_re};
+
+    my $linenum = 1;
+    while (my $line = <>) {
+        my $enc = guess_encoding_only1($line);
+        $line = decode($enc, $line);
+
+        if ($line =~ /$pattern_re/) {
+            print '(standard input):' if ($conf->{with_filename});
+            print $linenum, ':' if ($conf->{line_number});
+
+            if ($conf->{color}) {
+                $line =~ s/$pattern_re/\33[${HILIGHT_COLOR}m\33[K$&\33[m\33[K/g;
+            }
+            print $line;
+        }
+        $linenum++;
+    }
+}
+
 sub usage {
     say STDERR 'Usage: lgrepp [options] PATTERN [FILE...]';
     exit 1;
@@ -150,7 +172,7 @@ if ($opts{'recursive'}) {
          (@ARGV == 0 ? ('.') : @ARGV) );
 } elsif (@ARGV == 0) {
     parse_opts($conf);
-    lgrepp_file($conf, '/dev/stdin');
+    lgrepp_stdin($conf);
 } else {
     $conf->{with_filename} = (scalar(@ARGV) > 1);
     parse_opts($conf);
