@@ -23,6 +23,8 @@ my @DEFAULT_EXCLUDE_FILES =
         *.otf *.ttf *.ttc *.dfont
   );
 
+my @DEFAULT_EXCLUDE_DIRS = qw( .git .svn );
+
 sub parse_color_opts {
     my $conf = shift;
     my $color= $conf->{opts}->{color};
@@ -58,7 +60,9 @@ sub parse_file_num_opts {
 sub parse_exclude_opts {
     my $conf = shift;
     my @excludes = @DEFAULT_EXCLUDE_FILES;
+    my @exclude_dirs = @DEFAULT_EXCLUDE_DIRS;
     $conf->{excludes_re} = [ map { glob_to_regex($_) } @excludes ];
+    $conf->{exclude_dirs_re} = [ map { glob_to_regex($_) } @exclude_dirs ];
 }
 
 sub parse_opts {
@@ -92,7 +96,15 @@ sub is_excludes {
     my $conf = shift;
     my $file = shift;
     my $b = basename($file);
-    first { $b =~ $_ } @{$conf->{excludes_re}};
+
+    if (-d $file) {
+        if (first { $b =~ $_ } @{$conf->{exclude_dirs_re}}) {
+            $File::Find::prune = 1;
+        }
+        1;
+    } else {
+        first { $b =~ $_ } @{$conf->{excludes_re}};
+    }
 }
 
 my $HILIGHT_COLOR = '01;31';
@@ -101,7 +113,6 @@ sub lgrepp_file {
     my $conf = shift;
     my $file = shift;
 
-    return if (-d $file);
     return if (is_excludes($conf, $file));
 
     my $file_enc = encode($Encode::Locale::ENCODING_LOCALE_FS, $file);
