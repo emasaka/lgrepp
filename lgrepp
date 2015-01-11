@@ -197,7 +197,7 @@ if ($opts{'recursive'}) {
                                $File::Find::name );
                lgrepp_file($conf, $fn);
            },
-           follow_fast => 1, no_chdir => 1 } ,
+           follow_fast => 1, follow_skip => 2, no_chdir => 1 } ,
          (@ARGV == 0 ? ('.') : @ARGV) );
 } elsif (@ARGV == 0) {
     parse_opts($conf);
