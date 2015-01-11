@@ -12,7 +12,16 @@ use File::Basename;
 use Text::Glob qw(glob_to_regex);
 use List::Util qw(first);
 
-my @DEFAULT_EXCLUDE_FILES = qw(*.gz *.bz2 *.xz *.zip *.ZIP *.iso *.ISO);
+my @DEFAULT_EXCLUDE_FILES =
+    qw( *.gz *.bz2 *.xz *.zip *.ZIP
+        *.iso *.ISO
+        *.xlsx *.XLSX *.xls *.XLS *.docx *.DOCX *.doc *.DOC
+        *.pptx *.PPTX *.ppt *.PPT
+        *.odt *.ods *.odp
+        *.png *.PNG *.gif *.GIF *.jpg *.JPG *.bmp *.BMP *.ppm
+        *.pdf *.eps *.psd *.indd
+        *.otf *.ttf *.ttc *.dfont
+  );
 
 sub parse_color_opts {
     my $conf = shift;
