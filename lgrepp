@@ -8,6 +8,11 @@ use Encode::Guess;
 use Encode::Locale;
 use POSIX qw(isatty);
 use File::Find;
+use File::Basename;
+use Text::Glob qw(glob_to_regex);
+use List::Util qw(first);
+
+my @DEFAULT_EXCLUDE_FILES = qw(*.gz *.bz2 *.xz *.zip *.ZIP *.iso *.ISO);
 
 sub parse_color_opts {
     my $conf = shift;
@@ -41,11 +46,18 @@ sub parse_file_num_opts {
     $conf->{line_number} = 1 if ($conf->{opts}->{'line-number'});
 }
 
+sub parse_exclude_opts {
+    my $conf = shift;
+    my @excludes = @DEFAULT_EXCLUDE_FILES;
+    $conf->{excludes_re} = [ map { glob_to_regex($_) } @excludes ];
+}
+
 sub parse_opts {
     my $conf = shift;
     parse_color_opts($conf);
     parse_pattern_opts($conf);
     parse_file_num_opts($conf);
+    parse_exclude_opts($conf);
 }
 
 sub guess_encoding_only1 {
@@ -67,6 +79,13 @@ sub guess_encoding_only1 {
     }
 }
 
+sub is_excludes {
+    my $conf = shift;
+    my $file = shift;
+    my $b = basename($file);
+    first { $b =~ $_ } @{$conf->{excludes_re}};
+}
+
 my $HILIGHT_COLOR = '01;31';
 
 sub lgrepp_file {
@@ -74,6 +93,7 @@ sub lgrepp_file {
     my $file = shift;
 
     return if (-d $file);
+    return if (is_excludes($conf, $file));
 
     my $file_enc = encode($Encode::Locale::ENCODING_LOCALE_FS, $file);
     open my $fh, '<', $file_enc or do {
